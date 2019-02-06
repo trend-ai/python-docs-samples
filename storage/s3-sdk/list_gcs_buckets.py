@@ -26,10 +26,37 @@ Learn how to get GCS interoperable credentials at
 https://cloud.google.com/storage/docs/migrating#keys.
 """
 
-# [START storage_s3_sdk_list_buckets]
 import boto3
+from botocore.handlers import set_list_objects_encoding_type_url
+boto3.set_stream_logger(name='botocore')
+
+# [START storage_s3_sdk_create_bucket]
+def create_gcs_bucket(bucket_name):
+    """Create a GCS bucket using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
 
 
+    response = interop_client.create_bucket(Bucket=bucket_name,
+            CreateBucketConfiguration={'LocationConstraint': 'US'})
+# [END storage_s3_sdk_create_bucket]
+    return response
+
+# [START storage_s3_sdk_get_bucket]
+def get_gcs_bucket(bucket_name):
+    """Get a GCS bucket using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
+
+
+    response = interop_client.get_bucket_acl(Bucket=bucket_name)
+# [END storage_s3_sdk_get_bucket]
+    return response
+
+
+# [START storage_s3_sdk_list_buckets]
 def list_gcs_buckets():
     """Lists all GCS buckets using boto3 SDK"""
     # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
@@ -44,7 +71,84 @@ def list_gcs_buckets():
     for bucket in response["Buckets"]:
         print(bucket["Name"])
 # [END storage_s3_sdk_list_buckets]
+    return response
 
+# [START storage_s3_sdk_create_object]
+def create_gcs_object(bucket_name, local_file_path, object_name):
+    """Lists all GCS buckets using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
+
+
+    response = interop_client.upload_file(Filename=local_file_path, Bucket=bucket_name, Key=object_name)
+# [END storage_s3_sdk_create_object]
+    return response
+
+def list_gcs_objects(bucket_name):
+    """Lists all GCS buckets using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
+    interop_client.meta.events.unregister(
+    'before-parameter-build.s3.ListObjects',
+    set_list_objects_encoding_type_url)
+    response = interop_client.list_objects(Bucket=bucket_name)
+
+    # Print bucket names
+    print("Objects:")
+    for file in response["Contents"]:
+        print(file["Key"])
+# [END storage_s3_sdk_list_buckets]
+    return response
+
+# [START storage_s3_sdk_get_object]
+def get_gcs_object(bucket_name, object_name):
+    """Get GCS object using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
+
+
+    response = interop_client.get_object(Bucket=bucket_name, Key=object_name)
+# [END storage_s3_sdk_get_object]
+    return response
+
+# [START storage_s3_sdk_download_object]
+def download_gcs_object(bucket_name, object_name, local_file_path):
+    """Lists all GCS buckets using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
+
+
+    response = interop_client.download_file(Filename=local_file_path, Bucket=bucket_name, Key=object_name)
+# [END storage_s3_sdk_read_object]
+    return response
+
+# [START storage_s3_sdk_delete_object]
+def delete_gcs_object(bucket_name, object_name):
+    """Delete a GCS object using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
+
+
+    response = interop_client.delete_object(Bucket=bucket_name, Key=object_name)
+# [END storage_s3_sdk_delete_object]
+    return response
+
+# [START storage_s3_sdk_delete_bucket]
+def delete_gcs_bucket(bucket_name):
+    """Lists all GCS buckets using boto3 SDK"""
+    # Change the endpoint_url to use the Google Cloud Storage XML API endpoint.
+    interop_client = boto3.client('s3', region_name="auto",
+                                  endpoint_url="https://storage.googleapis.com")
+
+
+    response = interop_client.delete_bucket(Bucket=bucket_name)
+# [END storage_s3_sdk_delete_bucket]
+    return response
 
 if __name__ == '__main__':
     list_gcs_buckets()
