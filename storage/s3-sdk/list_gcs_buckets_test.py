@@ -24,6 +24,11 @@ def test_create_bucket(capsys):
     out, _ = capsys.readouterr()
     assert response is not None
 
+def test_update_bucket(capsys):
+    response = list_gcs_buckets.update_gcs_bucket(BUCKET)
+    out, _ = capsys.readouterr()
+    assert response is not None
+
 def test_get_bucket(capsys):
     response = list_gcs_buckets.get_gcs_bucket(BUCKET)
     out, _ = capsys.readouterr()
@@ -39,11 +44,16 @@ def test_create_object(capsys):
     response = list_gcs_buckets.create_gcs_object(BUCKET, "resources/example.txt", OBJECT)
     out, _ = capsys.readouterr()
 
+def test_clone_object(capsys):
+    response = list_gcs_buckets.clone_gcs_object(BUCKET, OBJECT, "clone")
+    out, _ = capsys.readouterr()
+
 def test_list_objects(capsys):
     response = list_gcs_buckets.list_gcs_objects(BUCKET)
     out, _ = capsys.readouterr()
     assert response is not None
     assert OBJECT in out
+    assert "clone" in out
 
 def test_get_object(capsys):
     response = list_gcs_buckets.get_gcs_object(BUCKET, OBJECT)
@@ -59,6 +69,12 @@ def test_delete_object(capsys):
     response = list_gcs_buckets.delete_gcs_object(BUCKET, OBJECT)
     out, _ = capsys.readouterr()
     assert response is not None
+    response = list_gcs_buckets.delete_gcs_object(BUCKET, "clone")
+
+# def test_delete_objects(capsys):
+#     response = list_gcs_buckets.delete_gcs_objects(BUCKET, [{"Key":OBJECT}, {"Key":"clone"}])
+#     out, _ = capsys.readouterr()
+#     assert response is not None
 
 def test_delete_bucket(capsys):
     response = list_gcs_buckets.delete_gcs_bucket(BUCKET)
